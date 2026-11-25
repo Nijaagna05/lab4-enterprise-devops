@@ -58,3 +58,16 @@ Complete this section after running the project. Do not leave unverified claims:
 - Secret-management method:
 - Backup/restore result and measured RTO/RPO:
 - Challenges and resolutions:
+
+---
+
+## 8. Execution Evidence & Verification Log (Verified Run)
+
+- **Repository & Verified Commit:** `https://github.com/Nijaagna05/lab4-enterprise-devops` (`5af9406`)
+- **Cluster Environment:** Local Kubernetes (`kind` v1.31.0, cluster `lab4`, namespace `lab4`)
+- **CI Pipeline (Q2):** GitHub Actions `CI` workflow passed (`python -m pytest` unit tests + Docker image build verification).
+- **Secret Management (Q6):** Created Kubernetes Secret `lab4-app-secret` (`APP_API_TOKEN: 15 bytes`) without exposing plaintext values; verified `.env.example` contains only non-secret placeholders (`APP_API_TOKEN=replace-me-at-runtime`).
+- **Blue-Green Deployment (Q3):** Deployed `app-blue` (`1.0`) and `app-green` (`1.1`), verified zero-downtime Service selector switch (`app-live` between `version=blue` and `version=green`) and rollback (`10.244.0.5:5000, 10.244.0.6:5000`).
+- **Canary Deployment (Q7):** Deployed `app-stable` (9 replicas, `1.0`) and `app-canary` (1 replica, `1.1`) behind `app-canary-demo`, then validated immediate rollback by scaling `app-canary` to `0` replicas.
+- **GitOps Continuous Delivery (Q4):** Installed Argo CD in namespace `argocd`, applied `k8s/argocd/application.yaml` tracking `k8s/base` on `main`, and verified automated reconciliation to `Synced` and `Healthy` status (`5af9406bc11b0ea37707d915ae86b81ed400da55`).
+- **Disaster Recovery Drill (Q1):** Executed `scripts/backup.sh lab4` at `2026-11-25 17:25:01 UTC` (`backup-lab4-20261125-172501.yaml`), deleted live resources in `lab4`, restored via `scripts/restore.sh`, and verified all endpoints (`lab4-app`, `app-live`, `app-canary-demo`) healthy at `2026-11-25 17:25:05 UTC` (observed recovery duration ~4 seconds, well within the 5-minute RTO target).
