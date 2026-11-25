@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab4-app
+  namespace: lab4
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lab4-app
+      track: stable
+  template:
+    metadata:
+      labels:
+        app: lab4-app
+        track: stable
+    spec:
+      containers:
+        - name: app
+          image: lab4-devops-app:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          env:
+            - name: APP_VERSION
+              value: "1.0.0"
+            - name: APP_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: lab4-app-secret
+                  key: APP_API_TOKEN
+                  optional: true
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 5000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lab4-app
+  namespace: lab4
+spec:
+  selector:
+    app: lab4-app
+    track: stable
+  ports:
+    - port: 80
+      targetPort: 5000
+  type: ClusterIP

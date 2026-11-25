@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: lab4-enterprise-devops
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Nijaagna05/lab4-enterprise-devops.git
+    targetRevision: main
+    path: k8s/base
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: lab4
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

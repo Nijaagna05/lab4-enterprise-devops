@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-stable
+  namespace: lab4
+spec:
+  replicas: 9
+  selector:
+    matchLabels:
+      app: lab4-canary-demo
+      track: stable
+  template:
+    metadata:
+      labels:
+        app: lab4-canary-demo
+        track: stable
+    spec:
+      containers:
+        - name: app
+          image: lab4-devops-app:1.0
+          ports:
+            - containerPort: 5000
